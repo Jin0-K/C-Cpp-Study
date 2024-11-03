@@ -14,12 +14,13 @@ int main(void)
     M: The given number
     */
     int N, M;
+    int *cards;
     int chosen_cards[3] = {0, 0, 0};
     int comparison[3];
     scanf("%d %d", &N, &M);
 
     // Get the information of the cards
-    int *cards = malloc(sizeof(int) * N);
+    cards = malloc(sizeof(int) * N);
     for (int i = 0; i < N; i++)
     {
         scanf("%d", cards + i);
