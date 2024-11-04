@@ -11,5 +11,6 @@ int main(void) {
         cin >> B;
         cout << A+B << endl;
     }
+    
     return 0;
 }
