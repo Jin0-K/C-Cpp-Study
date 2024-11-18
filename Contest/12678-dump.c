@@ -8,8 +8,11 @@ typedef struct Bus
 {
     int *busStop;
     int position;
+    bool arrived;
 } Bus;
 
+void allocDpCount(int *dpcount, int stopnum);
+void freeDpCount(int *dpcount);
 void allocBusStop(bool *busstop, int stopnum);
 void freeBusStop(bool *busstop);
 Bus allocBuses(Bus *buses, int busnum, int stopnum);
@@ -21,6 +24,7 @@ int main(void)
     int T, N, K, P; // N: Bus stop number, K: Bus number, P: Maximum distance move
     bool *busStop;  // Check if the stop was visited
     Bus *buses;     // Visited location of the buses(0 to K-1)
+    int *dpCount;
 
     scanf("%d", &T);
 
@@ -29,16 +33,27 @@ int main(void)
         scanf("%d %d %d", &N, &K, &P);
         printf("Case #%d: ", testcase);
 
+        allocDpCount(dpCount, N);
         allocBusStop(&busStop, N);
         allocBuses(buses, K, N);
 
         // Dynamic programming
 
+        freeDpCount(dpCount);
         freeBusStop(&busStop);
         freeBuses(buses, K);
     }
 
     return 0;
+}
+
+void allocDpCount(int *dpcount, int stopnum) {
+    dpcount = calloc(stopnum, sizeof(int));
+    dpcount[0] = 1;
+}
+
+void freeDpCount(int *dpcount) {
+    free(dpcount);
 }
 
 void allocBusStop(bool *busstop, int stopnum)
@@ -59,6 +74,7 @@ Bus allocBuses(Bus *buses, int busnum, int stopnum)
     {
         buses[i].busStop = calloc(stopnum, sizeof(int));
         buses[i].position = 0;
+        buses[i].arrived = false;
     }
 }
 
@@ -80,22 +96,42 @@ bool isAllArrived(bool *busstop, int stopnum, int busnum)
     return true;
 }
 
-int DP(bool *busstop, int stopnum, Bus *buses, int busnum, int maxmove, int busid, int pos)
+int DP(int *dpcount, bool *busstop, int stopnum, Bus *buses, int busnum, int maxmove, int pos)
 {
+    // Code for recursive implementation
     if (isAllArrived(busstop, stopnum, busnum))
     {
-        memset(busstop, false, sizeof(bool));
+        dpcount[buses[0].busStop[buses[0].position]]++;
         return 1;
     }
-    for (; busid < busnum; busid++) // Check all possibilities for each bus
+
+
+    // Code for loop implementation (NOT GONNA WORK)
+    while (!isAllArrived(busstop, stopnum, busnum)) // Loop untill all buses arrive the last K bus stops
     {
-        // if (busstop[pos])
-        // {
-        //     continue;
-        // }
-        // if (buses[busid].busStop[buses[busid].position] + maxmove < pos) {
-        //     return 0;
-        // }
+        if (busstop[pos])
+        {
+            continue;
+        }
+        for (int busId = 0; busId < busnum; busId++) {
+            if(!buses[busId].arrived) // When the bus has already arrived the destination
+            {
+                continue;
+            }
+            for(int move = 1; move < maxmove; move++) {
+                if(!busstop[buses[busId].busStop[buses[busId].position]]) // When the stop has not been visited
+                {
+                    busstop[buses[busId].busStop[buses[busId].position]] = true; // Check the stop as visited
+                    // push stack
+                    buses[busId].busStop[buses[busId].position + 1] = buses[busId].busStop[buses[busId].position] + move;
+                    if (buses[busId].busStop[buses[busId].position] > stopnum - busnum) { // If the bus has arrived
+                        buses[busId].arrived = true;
+                    }
+                    (buses[busId].position)++;
+                    break;
+                }
+            }
+        }
         // DP()
     }
 }
