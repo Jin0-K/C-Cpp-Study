@@ -6,7 +6,7 @@
 int compare(const void *a, const void *b);
 void convertExponential(int *array, int arraySize);
 int tilesToBuy(int n, int m, int *tiles);
-int cutTiles(int height, int width, int *tiles, int tileNum, int count);
+void cutTiles(int height, int width, int *tiles, int tileNum, int count);
 
 int main(void)
 {
@@ -52,16 +52,26 @@ void convertExponential(int *array, int arraySize)
     }
 }
 
+bool gotAll(int *arr, int arrSize) {
+    for (int i = 0; i < arrSize; i++) {
+        if (arr[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int tilesToBuy(int n, int m, int *tiles)
 {
     int bigTileCount = 0;
-    while (cutTiles(m, m, tiles, n, bigTileCount++))
-        ;
+    do {
+        cutTiles(m, m, tiles, n, bigTileCount++);
+    } while (!gotAll(tiles + bigTileCount, n - bigTileCount));
 
     return bigTileCount;
 }
 
-int cutTiles(int height, int width, int *tiles, int tileNum, int count)
+void cutTiles(int height, int width, int *tiles, int tileNum, int count)
 {
     for (int i = count; i < tileNum; i++)
     {
@@ -75,10 +85,6 @@ int cutTiles(int height, int width, int *tiles, int tileNum, int count)
             cutTiles(height - tiles[i], tiles[i], tiles, tileNum, i + 1);
             tiles[i] = 0;
         }
-        else
-        {
-            return 1;
-        }
     }
-    return 0;
+    return;
 }
