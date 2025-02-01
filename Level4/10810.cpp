@@ -26,5 +26,7 @@ int main()
     }
     cout << "\n";
 
+    free(buckets);
+
     return 0;
 }
